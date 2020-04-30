@@ -21,10 +21,8 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v1
         with:
-          username: $GITHUB_ACTOR
-          password: $GITHUB_TOKEN
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
           registry: docker.pkg.github.com
-          repository: $GITHUB_REPOSITORY/docker-ct-ng
+          repository: ${{ github.repository }}/docker-ct-ng
           tags: ${{steps.date.outputs.date}}
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
