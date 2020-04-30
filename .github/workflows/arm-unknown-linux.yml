@@ -1,0 +1,35 @@
+name: Crosstools NG
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build_docker_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Build and tag image
+        run: |
+          docker build -t "docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:${{steps.date.outputs.date}}" -f Dockerfile .
+          docker tag "docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:${{steps.date.outputs.date}}" \
+            "docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:latest"
+
+      - name: Docker login
+        run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Publish to GPR
+        run: |
+          docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/firmware-builder:${{steps.date.outputs.date}}"
+          docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/firmware-builder:latest"
