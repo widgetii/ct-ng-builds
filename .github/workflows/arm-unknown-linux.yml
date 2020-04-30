@@ -18,18 +18,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build and tag image
-        run: |
-          docker build -t "docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:${{steps.date.outputs.date}}" -f Dockerfile .
-          docker tag "docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:${{steps.date.outputs.date}}" \
-            "docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:latest"
-
-      - name: Docker login
-        run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+      - name: Build and push image
+        uses: docker/build-push-action@v1
+        with:
+          username: $GITHUB_ACTOR
+          password: $GITHUB_TOKEN
+          registry: docker.pkg.github.com
+          repository: $GITHUB_REPOSITORY/docker-ct-ng
+          tags: ${{steps.date.outputs.date}}
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - name: Publish to GPR
-        run: |
-          docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/firmware-builder:${{steps.date.outputs.date}}"
-          docker push "docker.pkg.github.com/$GITHUB_REPOSITORY/firmware-builder:latest"
