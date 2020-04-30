@@ -26,3 +26,31 @@ jobs:
           registry: docker.pkg.github.com
           repository: ${{ github.repository }}/docker-ct-ng
           tags: ${{steps.date.outputs.date}}
+
+  build_toolchains:
+    needs: build_docker_image
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Docker login
+        run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Pull Docker image
+        run: docker pull "docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:latest"
+
+      - name: Run image
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/x-tools
+          docker run -v $GITHUB_WORKSPACE/x-tools:/home/build/x-tools docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:latest arm-unknown-linux-musleabi
+
+      - name: Pack zip archive
+        run: mkdir output ; zip output/arm-unknown-linux-musleabi.zip $GITHUB_WORKSPACE/x-tools/arm-unknown-linux-musleabi/*
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: arm-unknown-linux-musleabi
+          path: output/arm-unknown-linux-musleabi.zip
