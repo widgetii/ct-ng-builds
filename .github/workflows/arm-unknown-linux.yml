@@ -24,12 +24,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
           registry: docker.pkg.github.com
-          repository: ${{ github.repository }}/docker-ct-ng
-          tags: ${{steps.date.outputs.date}}
+          repository: ${{ github.repository_owner }}/ct-ng
+          tags: ${{steps.date.outputs.date}},latest
 
   build_toolchains:
     needs: build_docker_image
     runs-on: ubuntu-latest
+
+    env:
+      CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository_owner }}/ct-ng:latest
 
     steps:
       - uses: actions/checkout@v1
@@ -40,12 +43,12 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Pull Docker image
-        run: docker pull "docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:latest"
+        run: docker pull "$CONTAINER_IMAGE"
 
       - name: Run image
         run: |
           mkdir -p $GITHUB_WORKSPACE/x-tools
-          docker run -v $GITHUB_WORKSPACE/x-tools:/home/build/x-tools docker.pkg.github.com/$GITHUB_REPOSITORY/docker-ct-ng:latest arm-unknown-linux-musleabi
+          docker run -v $GITHUB_WORKSPACE/x-tools:/home/build/x-tools $CONTAINER_IMAGE arm-unknown-linux-musleabi
 
       - name: Pack zip archive
         run: mkdir output ; zip output/arm-unknown-linux-musleabi.zip $GITHUB_WORKSPACE/x-tools/arm-unknown-linux-musleabi/*
