@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
 
-docker run widget/docker-ct-ng:latest
+mkdir -p x-tools
+chmod o+rwx x-tools
+
+docker run \
+  -v $(pwd)/x-tools:/home/build/x-tools \
+  widgetii/docker-ct-ng:latest \
+  arm-unknown-linux-musleabi

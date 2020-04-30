@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker build -t widget/docker-ct-ng .
+docker build -t widgetii/docker-ct-ng .
