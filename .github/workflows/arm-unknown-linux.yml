@@ -24,7 +24,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
           registry: docker.pkg.github.com
-          repository: ${{ github.repository_owner }}/ct-ng
+          repository: ${{ github.repository }}/ct-ng
           tags: ${{steps.date.outputs.date}},latest
 
   build_toolchains:
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository_owner }}/ct-ng:latest
+      CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/ct-ng:latest
 
     steps:
       - uses: actions/checkout@v1
