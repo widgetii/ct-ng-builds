@@ -48,6 +48,7 @@ jobs:
       - name: Run image
         run: |
           mkdir -p $GITHUB_WORKSPACE/x-tools
+          chmod o+rwx $GITHUB_WORKSPACE/x-tools
           docker run -v $GITHUB_WORKSPACE/x-tools:/home/build/x-tools $CONTAINER_IMAGE arm-unknown-linux-musleabi
 
       - name: Pack zip archive
