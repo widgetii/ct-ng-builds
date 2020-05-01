@@ -33,14 +33,13 @@ jobs:
 
     env:
       CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/ct-ng:latest
+      GITHUB_TOKEN: ${{ secrets.GTOKEN }}
 
     steps:
       - uses: actions/checkout@v1
 
       - name: Docker login
         run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Pull Docker image
         run: docker pull "$CONTAINER_IMAGE"
@@ -61,8 +60,6 @@ jobs:
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.date.outputs.date }}
           release_name: Release ${{ steps.date.outputs.date }}
@@ -71,8 +68,6 @@ jobs:
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./x-tools/arm-unknown-linux-musleabi.tar.xz
