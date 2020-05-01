@@ -37,6 +37,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+        with:
+          fetch-depth: 0
 
       - name: Docker login
         run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
@@ -56,8 +58,11 @@ jobs:
 
       - name: Create release
         id: create_release
-        uses: actions/create-release@v1
+        # use branch due to opened issue
+        # https://github.com/actions/create-release/pull/12
+        uses: vicr123/create-release@delete-old-release
         with:
+          replace_old_tag: true
           tag_name: ${{ steps.date.outputs.date }}
           release_name: Release ${{ steps.date.outputs.date }}
           draft: false
