@@ -54,7 +54,26 @@ jobs:
       - name: Pack zip archive
         run: mkdir output ; zip output/arm-unknown-linux-musleabi.zip $GITHUB_WORKSPACE/x-tools/arm-unknown-linux-musleabi/*
 
-      - uses: actions/upload-artifact@v2
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: arm-unknown-linux-musleabi
-          path: output/arm-unknown-linux-musleabi.zip
+          tag_name: ${{ steps.date.outputs.date }}
+          release_name: Release ${{ steps.date.outputs.date }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./x-tools/arm-unknown-linux-musleabi.tar.xz
+          asset_name: arm-unknown-linux-musleabi.tar.xz
