@@ -41,17 +41,14 @@ jobs:
       - name: Docker login
         run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
 
-      - name: Pull Docker image
+      - name: Pull Docker image with crosstools-ng
         run: docker pull "$CONTAINER_IMAGE"
 
-      - name: Run image
+      - name: Run ct-ng build
         run: |
           mkdir -p $GITHUB_WORKSPACE/x-tools
           chmod o+rwx $GITHUB_WORKSPACE/x-tools
           docker run -v $GITHUB_WORKSPACE/x-tools:/home/build/x-tools $CONTAINER_IMAGE arm-unknown-linux-musleabi
-
-      - name: Pack zip archive
-        run: mkdir output ; zip output/arm-unknown-linux-musleabi.zip $GITHUB_WORKSPACE/x-tools/arm-unknown-linux-musleabi/*
 
       - name: Get current date
         id: date
@@ -72,3 +69,4 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./x-tools/arm-unknown-linux-musleabi.tar.xz
           asset_name: arm-unknown-linux-musleabi.tar.xz
+          asset_content_type: application/x-tar
